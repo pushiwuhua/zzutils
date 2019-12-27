@@ -328,3 +328,59 @@ suspend fun netIsNormal(overTime: Int): Boolean {
     }
 }
 
+/**
+ * 根据手机的分辨率从 dp 的单位 转成为 px(像素)
+ * @param dpValue 要转换的dp值
+ */
+fun Context.dip2px(dpValue: Float): Int {
+    val scale = resources.displayMetrics.density
+    return (dpValue * scale + 0.5f).toInt()
+}
+
+/**
+ * 将 sp 转换为 px， 保证尺寸大小不变
+ * @param pxValue
+ * @return
+ */
+fun Context.sp2px(pxValue: Float): Int {
+    val fontScale = resources.displayMetrics.scaledDensity
+    return (pxValue * fontScale + 0.5f).toInt()
+}
+
+/**
+ * 获取版本号
+ */
+@Suppress("DEPRECATION")
+fun Context.getVerCode(): Int {
+    var verCode = -1
+    try {
+        verCode = packageManager.getPackageInfo(packageName, 0).versionCode
+    } catch (localNameNotFoundException: PackageManager.NameNotFoundException) {
+    }
+    return verCode
+}
+
+/**
+ * 获取版本名
+ */
+fun Context.getVerName(): String? {
+    var verName: String? = ""
+    try {
+        verName = packageManager.getPackageInfo(packageName, 0).versionName
+    } catch (localNameNotFoundException: PackageManager.NameNotFoundException) {
+    }
+    return verName
+}
+
+/**
+ * 获取App名称
+ */
+fun getAppName(context: Context): String? {
+    return context.resources.getText(
+        context.resources.getIdentifier(
+            "app_name",
+            "string",
+            context.packageName
+        )
+    ).toString()
+}
