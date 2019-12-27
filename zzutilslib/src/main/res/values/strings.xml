@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">zzutils</string>
+
+    <!--过滤重复点击事件的resource id 标记-->
+    <string name="view_single_click">view_single_click</string>
+</resources>

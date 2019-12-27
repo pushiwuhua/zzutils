@@ -1,0 +1,2 @@
+include ':app', ':zzutilslib'
+rootProject.name='zzutils'
