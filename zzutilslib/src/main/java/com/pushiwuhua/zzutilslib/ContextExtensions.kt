@@ -109,12 +109,12 @@ fun Context.isEnableGPSProvider(): Boolean {
     )
 }
 
-///**
-// * 是否支持蓝牙
-// */
-//fun Context.isEnableBlueTooth(): Boolean {
-//    return KBTUtilQk.get(this).isBlueToothEnable()
-//}
+/**
+ * 是否支持蓝牙
+ */
+fun Context.isEnableBlueTooth(): Boolean {
+    return KBTUtilQk.get(this).isBlueToothEnable()
+}
 
 /**
  * 是否存在NFC模块
