@@ -12,6 +12,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
+import android.net.ConnectivityManager
 import android.net.Uri
 import android.nfc.NfcAdapter
 import android.os.Build
@@ -448,4 +449,55 @@ fun Context.getUUID(): String? {
         Utils.savePreferenceString(this, "uuid", uuid)
     }
     return uuid
+}
+
+/**
+ * 检测是否有网络连接，如果无网络连接，弹出“网络未连接提示”
+ *
+ * @return 是否网络连接
+ */
+fun Context.isNetworkAvailableWithTip(): Boolean {
+    val flag = checkNetworkState()
+    if (!flag) {
+        toast("网络未连接")
+    }
+    return flag
+}
+
+/**
+ * 检测是否有网络连接,并返回结果，无任何界面提示
+ *
+ * @param context
+ * @return
+ */
+fun Context.isNetworkAvailable(): Boolean {
+    return checkNetworkState()
+}
+
+/**
+ * 判断wifi是否连接
+ */
+fun Context.isWifiAvailable(): Boolean {
+    var isWifiConnected = false
+    val manager =
+        applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager //得到网络连接信息
+    val networkInfo = manager.activeNetworkInfo
+    if (networkInfo != null && networkInfo.type == ConnectivityManager.TYPE_WIFI) {
+        isWifiConnected = networkInfo.isConnected
+    }
+    return isWifiConnected
+}
+
+/**
+ * 判断网络是否连接
+ */
+fun Context.checkNetworkState(): Boolean {
+    var isConnect = false
+    val manager =
+        applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager //得到网络连接信息
+    val networkInfo = manager.activeNetworkInfo
+    if (networkInfo != null) {
+        isConnect = networkInfo.isAvailable //去进行判断网络是否连接
+    }
+    return isConnect
 }
