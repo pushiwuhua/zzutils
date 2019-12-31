@@ -21,9 +21,11 @@ import android.os.PowerManager
 import android.provider.Settings
 import android.telephony.TelephonyManager
 import android.text.TextUtils
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
+import android.view.WindowManager
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.annotation.IdRes
@@ -501,3 +503,26 @@ fun Context.checkNetworkState(): Boolean {
     }
     return isConnect
 }
+
+/**
+ * 获得屏幕高度
+ * @return
+ */
+fun Context.getScreenWidth(): Int {
+    val wm = applicationContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    val outMetrics = DisplayMetrics()
+    wm.defaultDisplay.getMetrics(outMetrics)
+    return outMetrics.widthPixels
+}
+
+/**
+ * 获得屏幕宽度
+ * @return
+ */
+fun Context.getScreenHeight(): Int {
+    val wm = applicationContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+    val outMetrics = DisplayMetrics()
+    wm.defaultDisplay.getMetrics(outMetrics)
+    return outMetrics.heightPixels
+}
+
