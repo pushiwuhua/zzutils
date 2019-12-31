@@ -22,11 +22,6 @@ package com.pushiwuhua.zzutilslib
  * 常量配置
  * wzz created at 2019/12/27 14:04
  */
-const val PAGESIZE = 10//默认的分页加载数
-const val OVERTIME = 20L//服务器接口超时时间配置
-const val MAX_PAGESIZE = 10000//服务器偷懒, 不返回分页加载
-const val LOCAL_PAGESIZE = 10000//本地的分页加载数
-
 const val Permission_REQ_CODE_LOCATION = 110 //请求位置权限
 const val Permission_REQ_CODE_READ_PHONE_SATE = 111 //请求设备状态权限
 const val Permission_REQ_CODE_WRITE_EXTERNAL_STORAGE = 112 //请求设备存储权限
