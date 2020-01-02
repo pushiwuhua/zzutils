@@ -5,7 +5,9 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.pushiwuhua.zzutilslib.KOneFilter
+import com.pushiwuhua.zzutilslib.KWaitingDialog
 import com.pushiwuhua.zzutilslib.singleClick
 import kotlinx.android.synthetic.main.activity_main.*
 
@@ -17,6 +19,7 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         fab.singleClick {
             Log.i("wzz", "MainActivity onCreate2 ")
+            KWaitingDialog.open(lifecycleScope,supportFragmentManager,"haha")
         }
         val filter: KOneFilter<Boolean> = KOneFilter()
         Log.i("wzz", "MainActivity onCreate ${filter.out(true)}")
