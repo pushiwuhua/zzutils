@@ -12,7 +12,9 @@ import com.pushiwuhua.zzutilslib.KOneFilter
 import com.pushiwuhua.zzutilslib.KWaitingDialog
 import com.pushiwuhua.zzutilslib.singleClick
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import okhttp3.Call
 import java.io.File
 import java.net.URL
@@ -32,6 +34,7 @@ class MainActivity : AppCompatActivity() {
                 object : KDownQk.Status {
                     override fun err(err: Throwable) {
                         Log.i("wzz", "MainActivity err $err")
+                        btnDown.text = "下载"
                     }
 
                     override fun finish() {
@@ -46,7 +49,10 @@ class MainActivity : AppCompatActivity() {
                     override fun downing(percents: Float) {
                         Log.i("wzz", "MainActivity downing $percents ${Thread.currentThread()}")
                         lifecycleScope.launch {
-                            Log.i("wzz", "MainActivity downing 内部 $percents ${Thread.currentThread()}")
+                            Log.i(
+                                "wzz",
+                                "MainActivity downing 内部 $percents ${Thread.currentThread()}"
+                            )
                             btnDown.text = "下载$percents"
                         }
                     }

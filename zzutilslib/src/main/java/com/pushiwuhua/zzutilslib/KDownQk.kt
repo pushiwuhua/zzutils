@@ -3,9 +3,6 @@
 package com.pushiwuhua.zzutilslib
 
 import android.util.Log
-import androidx.annotation.UiThread
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import okhttp3.*
 import java.io.File
 import java.io.FileOutputStream
@@ -55,7 +52,7 @@ object KDownQk {
      * 写入文件
      */
     private fun writeFile(response: Response, outFile: File, downStatus: Status) {
-        Log.i("wzz", "KDownQk writeFile $outFile")
+//        Log.i("wzz", "KDownQk writeFile $outFile")
         val ins = response.body?.byteStream()
         val fos = FileOutputStream(outFile)
         kotlin.runCatching {
@@ -64,26 +61,26 @@ object KDownQk {
             //获取下载的文件的大小
             val fileSize = response.body!!.contentLength()
             downStatus.start()
-            Log.i("wzz", "KDownQk writeFile 文件总大小 $fileSize")
+//            Log.i("wzz", "KDownQk writeFile 文件总大小 $fileSize")
             var sum: Long = 0
             var porSize: Int
             while (ins?.read(bytes).also { it?.let { len = it } } != -1) {
-                Log.i("wzz", "KDownQk writeFile 每一次读写 $len")
+//                Log.i("wzz", "KDownQk writeFile 每一次读写 $len")
                 fos.write(bytes, 0, len)
                 sum += len.toLong()
                 porSize = (sum * 1.0f / fileSize * 100).toInt()
-                Log.i("wzz", "KDownQk writeFile 百分比 $fileSize $sum $porSize")
+//                Log.i("wzz", "KDownQk writeFile 百分比 $fileSize $sum $porSize")
                 downStatus.downing(porSize.toFloat())
             }
         }.onFailure {
-            Log.i("wzz", "KDownQk writeFile 失败 $it")
+//            Log.i("wzz", "KDownQk writeFile 失败 $it")
             ins?.close()
             fos.close()
             downStatus.err(it)
         }
             .onSuccess {
-                Log.i("wzz", "KDownQk writeFile 成功")
-                Log.i("wzz", "KDownQk writeFile 线程 ${Thread.currentThread()}")
+//                Log.i("wzz", "KDownQk writeFile 成功")
+//                Log.i("wzz", "KDownQk writeFile 线程 ${Thread.currentThread()}")
                 ins?.close()
                 fos.flush()
                 fos.close()
