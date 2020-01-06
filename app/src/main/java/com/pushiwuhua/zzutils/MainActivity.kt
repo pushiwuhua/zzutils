@@ -34,12 +34,16 @@ class MainActivity : AppCompatActivity() {
                 object : KDownQk.Status {
                     override fun err(err: Throwable) {
                         Log.i("wzz", "MainActivity err $err")
-                        btnDown.text = "下载"
+                        lifecycleScope.launch {
+                            btnDown.text = "下载"
+                        }
                     }
 
                     override fun finish() {
                         Log.i("wzz", "MainActivity finish ")
-                        btnDown.text = "下载"
+                        lifecycleScope.launch {
+                            btnDown.text = "下载"
+                        }
                     }
 
                     override fun start() {
