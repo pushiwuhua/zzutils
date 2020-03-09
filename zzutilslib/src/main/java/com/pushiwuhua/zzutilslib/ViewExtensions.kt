@@ -86,7 +86,7 @@ inline fun <T : View> T.multipleClick(num: Int, time: Long = 800, crossinline bl
     var clickedNum = 0
     setOnClickListener {
         val currentTimeMillis = System.currentTimeMillis()
-        if (currentTimeMillis - lastClickTime > time) {
+        if (abs(currentTimeMillis - lastClickTime) > time) {
             lastClickTime = currentTimeMillis
             clickedNum = 1
         } else {
@@ -106,7 +106,7 @@ inline fun <T : View> T.multipleClick(num: Int, time: Long = 800, crossinline bl
 inline fun <T : View> T.singleClick(time: Long = 800, crossinline block: (T) -> Unit) {
     setOnClickListener {
         val currentTimeMillis = System.currentTimeMillis()
-        if (currentTimeMillis - lastClickTime > time) {
+        if (abs(currentTimeMillis - lastClickTime) > time) {
             lastClickTime = currentTimeMillis
             block(this)
         }
