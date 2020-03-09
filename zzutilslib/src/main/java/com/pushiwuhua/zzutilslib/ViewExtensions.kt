@@ -10,6 +10,7 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Checkable
 import android.widget.EditText
+import kotlin.math.abs
 
 /**
  * 此文件封装一些常用的控件的扩展函数
@@ -116,7 +117,7 @@ inline fun <T : View> T.singleClick(time: Long = 800, crossinline block: (T) -> 
 fun <T : View> T.singleClick(onClickListener: View.OnClickListener, time: Long = 800) {
     setOnClickListener {
         val currentTimeMillis = System.currentTimeMillis()
-        if (currentTimeMillis - lastClickTime > time || this is Checkable) {
+        if (abs(currentTimeMillis - lastClickTime) > time || this is Checkable) {
             lastClickTime = currentTimeMillis
             onClickListener.onClick(this)
         }
