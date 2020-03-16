@@ -67,11 +67,13 @@ object KWaitingDialog : DialogFragment() {
         showText: String = "",
         delayMSecs: Long = 200
     ) {
-        KWaitingDialog.showText = showText
-        manager?.let {
-            job = scope.launch {
-                delay(delayMSecs)
-                show(manager, "KWaitingDialog")
+        kotlin.runCatching {
+            KWaitingDialog.showText = showText
+            manager?.let {
+                job = scope.launch {
+                    delay(delayMSecs)
+                    show(manager, "KWaitingDialog")
+                }
             }
         }
     }
