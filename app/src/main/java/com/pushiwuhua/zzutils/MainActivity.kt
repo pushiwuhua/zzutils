@@ -1,16 +1,18 @@
 package com.pushiwuhua.zzutils
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.annotation.UiThread
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import com.pushiwuhua.zzutilslib.KDownQk
-import com.pushiwuhua.zzutilslib.KOneFilter
-import com.pushiwuhua.zzutilslib.KWaitingDialog
-import com.pushiwuhua.zzutilslib.singleClick
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.*
+import com.pushiwuhua.zzutilslib.*
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -18,6 +20,8 @@ import kotlinx.coroutines.withContext
 import okhttp3.Call
 import java.io.File
 import java.net.URL
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,6 +29,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
+
+        lifecycleScope.launch {
+            requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1);
+            KFileUtils.copyAssets2(
+                this@MainActivity,
+                File("3dmodel"),
+                File(Environment.getExternalStorageDirectory().path + File.separator + "testHaHa")
+            )
+        }
+
         var call: Call? = null
         btnDown.singleClick {
             Log.i("wzz", "MainActivity onCreate 线程${Thread.currentThread()}")

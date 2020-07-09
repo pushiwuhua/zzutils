@@ -2,6 +2,7 @@
 
 package com.pushiwuhua.zzutilslib
 
+import android.app.Activity
 import android.graphics.Bitmap
 import android.os.Environment
 import java.io.File
@@ -124,6 +125,36 @@ object KFileUtils {
             true
         } catch (e: Exception) {
             false
+        }
+    }
+
+    /**
+     * 将Assets目录里的文件或目录复制到目标目录
+     * 需文件操作权限
+     */
+    fun copyAssets2(activity: Activity, src: File, toPath: File) {
+        val filePaths = activity.assets.list(src.path)
+        if (!File(toPath.path).exists()) {
+            File(toPath.path).mkdir()
+        }
+        filePaths?.forEach {
+            activity.assets.list("${src.path}${File.separator}$it")?.size?.let { size ->
+                if (size > 0) {
+                    copyAssets2(
+                        activity,
+                        File("${src.path}${File.separator}$it"),
+                        File("${toPath.path}${File.separator}$it")
+                    )
+                } else {
+                    val newFilePath = "${toPath}${File.separator}$it"
+                    if (!File(newFilePath).exists()) {
+                        File(newFilePath).createNewFile()
+                    }
+                    File(newFilePath).writeBytes(
+                        activity.assets.open("${src.path}${File.separator}$it").readBytes()
+                    )
+                }
+            }
         }
     }
 }
