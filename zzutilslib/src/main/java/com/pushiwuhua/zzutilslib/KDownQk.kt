@@ -53,13 +53,13 @@ object KDownQk {
      */
     private fun writeFile(response: Response, outFile: File, downStatus: Status) {
 //        Log.i("wzz", "KDownQk writeFile $outFile")
-        val ins = response.body()?.byteStream()
+        val ins = response.body?.byteStream()
         val fos = FileOutputStream(outFile)
         kotlin.runCatching {
             val bytes = ByteArray(1024)
             var len = 0
             //获取下载的文件的大小
-            val fileSize = response.body()!!.contentLength()
+            val fileSize = response.body!!.contentLength()
             downStatus.start()
 //            Log.i("wzz", "KDownQk writeFile 文件总大小 $fileSize")
             var sum: Long = 0
