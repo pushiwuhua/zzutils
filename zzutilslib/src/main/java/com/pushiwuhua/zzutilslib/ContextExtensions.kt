@@ -5,10 +5,13 @@ package com.pushiwuhua.zzutilslib
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityManager
+import android.app.ActivityManager.RunningAppProcessInfo
 import android.bluetooth.BluetoothAdapter
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
 import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
@@ -38,12 +41,14 @@ import androidx.databinding.ViewDataBinding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
+import com.pushiwuhua.zzutilslib.KPicUtils.getBitmapZoom
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import java.io.File
+import java.io.InputStreamReader
 import java.net.URL
-import java.util.*
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
@@ -144,12 +149,10 @@ fun Context.isEnableNFC(): Boolean {
  */
 fun Context.isIgnoringBatteryOptimizations(): Boolean {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        try {
+        kotlin.runCatching {
             val pm = getSystemService(Context.POWER_SERVICE) as PowerManager
             pm.isIgnoringBatteryOptimizations(packageName)
-        } catch (e: Exception) {
-            true
-        }
+        }.isSuccess
     } else {
         true
     }
@@ -404,8 +407,6 @@ fun Context.getAppName(): String? {
  * 2， IMEI（imei）；
  * 3， 序列号（sn）；
  * 4， id：随机码。若前面的都取不到时，则随机生成一个随机码，需要缓存。
- *
- * @param context
  * @return
  */
 fun Context.getDeviceId(): String? {
@@ -427,30 +428,10 @@ fun Context.getDeviceId(): String? {
             deviceId.append(sn)
             return deviceId.toString()
         }
-        //如果上面都没有， 则生成一个id：随机码
-        val uuid = getUUID()
-        if (!TextUtils.isEmpty(uuid)) {
-            deviceId.append("id")
-            deviceId.append(uuid)
-            return deviceId.toString()
-        }
     } catch (e: java.lang.Exception) {
         e.printStackTrace()
-        deviceId.append("id").append(getUUID())
     }
     return deviceId.toString()
-}
-
-/**
- * 得到全局唯一UUID
- */
-fun Context.getUUID(): String? {
-    var uuid = Utils.getPreferenceString(this, "uuid")
-    if (TextUtils.isEmpty(uuid)) {
-        uuid = UUID.randomUUID().toString()
-        Utils.savePreferenceString(this, "uuid", uuid)
-    }
-    return uuid
 }
 
 /**
@@ -468,8 +449,6 @@ fun Context.isNetworkAvailableWithTip(): Boolean {
 
 /**
  * 检测是否有网络连接,并返回结果，无任何界面提示
- *
- * @param context
  * @return
  */
 fun Context.isNetworkAvailable(): Boolean {
@@ -505,10 +484,55 @@ fun Context.checkNetworkState(): Boolean {
 }
 
 /**
+ * 隐藏软键盘
+ */
+fun Context.hideKeyBoard() {
+    val imm =
+        applicationContext.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    if (imm.isActive) {
+        imm.toggleSoftInput(0, InputMethodManager.HIDE_NOT_ALWAYS)
+    }
+}
+
+/**
+ * 隐藏软键盘
+ */
+fun Context.forceHideKeyBoard(v: View) {
+    val imm = applicationContext
+        .getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    if (imm.isActive) {
+        imm.hideSoftInputFromWindow(v.applicationWindowToken, 0)
+    }
+}
+
+/**
+ * 强制弹出软键盘，传递一个EditText控件进去
+ *
+ * @param targetView
+ */
+fun forceShowKeyBoard(targetView: View) {
+    val imm =
+        targetView.context.applicationContext
+            .getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+    imm.showSoftInput(targetView, InputMethodManager.SHOW_FORCED)
+}
+
+/**
+ * 从assets目录中读取文本内容
+ * @param fileName 资源文件名
+ * @return
+ */
+fun Context.readContentFromAssets(fileName: String): String {
+    val inputReader =
+        InputStreamReader(resources.assets.open(fileName))
+    return inputReader.readText()
+}
+
+/**
  * 获得屏幕高度
  * @return
  */
-fun Context.getScreenWidth(): Int {
+fun Context.screenWidth(): Int {
     val wm = applicationContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     val outMetrics = DisplayMetrics()
     wm.defaultDisplay.getMetrics(outMetrics)
@@ -516,13 +540,97 @@ fun Context.getScreenWidth(): Int {
 }
 
 /**
- * 获得屏幕宽度
+ * 获得屏幕高度
  * @return
  */
-fun Context.getScreenHeight(): Int {
+fun Context.screenHeight(): Int {
     val wm = applicationContext.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     val outMetrics = DisplayMetrics()
     wm.defaultDisplay.getMetrics(outMetrics)
     return outMetrics.heightPixels
 }
 
+/**
+ * 获取manifest meta值  用处之一: 百度推送获取api key
+ * @param metaKey
+ * @return wzz
+ */
+fun Context.metaValue(metaKey: String?): String? {
+    var metaData: Bundle?
+    var apiKey: String?
+    metaKey?.let {
+        runCatching {
+            val ai = packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA)
+            metaData = ai.metaData
+            apiKey = metaData?.getString(metaKey)
+            return apiKey
+        }.onFailure {
+            return null
+        }
+    }
+    return null
+}
+
+/**
+ * 通知系统更新扫描新的图片
+ * @param newImagePath 新的图片地址
+ */
+fun Context.updateGallery(newImagePath: String) {
+    val intent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+    val uri = Uri.fromFile(File(newImagePath))
+    intent.data = uri
+    sendBroadcast(intent) //这个广播的目的就是更新图库，发了这个广播进入相册就可以找到你保存的图片了！，记得要传你更新的file哦
+}
+
+/**
+ * 判断app在前台还是后台,wzz封装已测, 此函数速度很快,毫秒数在个位数
+ */
+fun Context.checkAppBackground(): Boolean {
+    val activityManager =
+        applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    val appProcesses = activityManager.runningAppProcesses
+    if (appProcesses != null && appProcesses.size > 0) {
+        for (appProcess in appProcesses) {
+            if (appProcess.processName == packageName) {
+                return appProcess.importance != RunningAppProcessInfo.IMPORTANCE_FOREGROUND
+            }
+        }
+    }
+    return false
+}
+
+fun Context.getBitmapZoomDp(bm: Bitmap, wdp: Int, hdp: Int): Bitmap? {
+    val newWidth: Int = dip2px(wdp.toFloat())
+    val newHeight: Int = dip2px(hdp.toFloat())
+    return getBitmapZoom(bm, newWidth, newHeight)
+}
+
+/**
+ * 检查某APK是否存在
+ * @param packageName
+ * @return
+ */
+fun Context.checkApkExist(packageName: String): Boolean {
+    return if (TextUtils.isEmpty(packageName)) false else try {
+        packageManager.getApplicationInfo(packageName, PackageManager.GET_UNINSTALLED_PACKAGES)
+        true
+    } catch (e: PackageManager.NameNotFoundException) {
+        false
+    }
+}
+
+/**
+ * 判断应用是否已经启动
+ * @param packageName 要判断应用的包名
+ * @return boolean
+ */
+fun Context.isAppAlive(packageName: String): Boolean {
+    val activityManager = applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    val processInfos = activityManager.runningAppProcesses
+    for (i in processInfos.indices) {
+        if (processInfos[i].processName == packageName) {
+            return true
+        }
+    }
+    return false
+}
