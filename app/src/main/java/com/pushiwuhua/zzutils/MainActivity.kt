@@ -30,14 +30,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
-        lifecycleScope.launch {
-            requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1);
-            KFileUtils.copyAssets2(
-                this@MainActivity,
-                File("3dmodel"),
-                File(Environment.getExternalStorageDirectory().path + File.separator + "testHaHa")
-            )
-        }
+//        lifecycleScope.launch {
+//            requestPermissions(arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 1);
+//            KFileUtils.copyAssets2(
+//                this@MainActivity,
+//                File("3dmodel"),
+//                File(Environment.getExternalStorageDirectory().path + File.separator + "testHaHa")
+//            )
+//        }
 
         var call: Call? = null
         btnDown.singleClick {
