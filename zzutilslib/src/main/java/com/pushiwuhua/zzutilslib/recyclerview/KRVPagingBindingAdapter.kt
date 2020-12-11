@@ -14,9 +14,9 @@ import androidx.recyclerview.widget.DiffUtil
  * wzz created at 2019/7/8 14:14
  */
 class KRVPagingBindingAdapter<T>(diffCallback: DiffUtil.ItemCallback<T>) :
-        PagedListAdapter<T, KRVBaseHolder<T>>(diffCallback) {
+    PagedListAdapter<T, KRVBaseHolder<T>>(diffCallback) {
     private var layoutIdNormal = -1//普通的列表布局ID
-    private lateinit var methedNormal: ((ViewDataBinding, T?) -> Unit)
+    private lateinit var methedNormal: ((ViewDataBinding, Int, T?) -> Unit)
 
     enum class EnumTypeItemView {
         NORMAL {
@@ -34,10 +34,10 @@ class KRVPagingBindingAdapter<T>(diffCallback: DiffUtil.ItemCallback<T>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): KRVBaseHolder<T> {
         val binding = DataBindingUtil.inflate<ViewDataBinding>(
-                LayoutInflater.from(parent.context),
-                layoutIdNormal,
-                parent,
-                false
+            LayoutInflater.from(parent.context),
+            layoutIdNormal,
+            parent,
+            false
         )
 
         return KRVBaseHolder(binding, methedNormal)
@@ -45,10 +45,13 @@ class KRVPagingBindingAdapter<T>(diffCallback: DiffUtil.ItemCallback<T>) :
 
     override fun onBindViewHolder(holder: KRVBaseHolder<T>, pos: Int) {
         val data = getItem(pos)
-        holder.method.invoke(holder.binding, data)
+        holder.method.invoke(holder.binding, pos, data)
     }
 
-    fun withLayout(layoutId: Int, method: (ViewDataBinding, T?) -> Unit): KRVPagingBindingAdapter<T> {
+    fun withLayout(
+        layoutId: Int,
+        method: (ViewDataBinding, Int, T?) -> Unit
+    ): KRVPagingBindingAdapter<T> {
         layoutIdNormal = layoutId
         methedNormal = method
         return this

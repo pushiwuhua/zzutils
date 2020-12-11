@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             Log.i("wzz", "MainActivity onCreate 线程${Thread.currentThread()}")
             call = KDownQk.downFile(
                 URL("https://ossn.cmfun.cn/group1/M00/00/01/CgsANl4O9n-ANiTdAnTs1bcvWIY653.apk"),
-                File(getExternalFilesDir("").absolutePath + "/ttt${System.currentTimeMillis()}.apk"),
+                File(getExternalFilesDir("")!!.absolutePath + "/ttt${System.currentTimeMillis()}.apk"),
                 object : KDownQk.Status {
                     override fun err(err: Throwable) {
                         Log.i("wzz", "MainActivity err $err")
