@@ -3,6 +3,7 @@
 package com.pushiwuhua.zzutilslib
 
 import android.content.Context
+import android.content.DialogInterface
 import android.text.TextUtils
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -19,6 +20,11 @@ class KDialogQk private constructor(private val context: Context) {
     private var buttonTextNegative: String? = null//否定的按钮文本
     private var buttonTextPositive: String? = null//肯定的按钮文本
     private var configView: View? = null//自定义的视图
+
+    /**
+     * 返回的数据结构
+     */
+    data class Res(val dialog: DialogInterface, val result: Boolean)
 
     companion object {
         /**
@@ -88,7 +94,7 @@ class KDialogQk private constructor(private val context: Context) {
      *
      * @return
      */
-    suspend fun build(): Boolean {
+    suspend fun build(): Res {
         return suspendCoroutine {
             val builder = AlertDialog.Builder(context)
             builder.setTitle(title)
@@ -97,29 +103,30 @@ class KDialogQk private constructor(private val context: Context) {
                 builder.setView(configView)
             }
 
-            if (!TextUtils.isEmpty(buttonTextNegative)){
+            if (!TextUtils.isEmpty(buttonTextNegative)) {
                 builder.setNegativeButton(buttonTextNegative) { dialog, _ ->
                     dialog.dismiss()
-                    it.resumeWith(Result.success(false))
+                    it.resumeWith(Result.success(Res(dialog, false)))
                 }
             }
             if (!TextUtils.isEmpty(buttonTextPositive)) {
                 builder.setPositiveButton(buttonTextPositive) { dialog, _ ->
                     dialog.dismiss()
-                    it.resumeWith(Result.success(true))
+                    it.resumeWith(Result.success(Res(dialog, true)))
 //                    it.resume(true)
 //                    emitter.onNext(java.lang.Boolean.TRUE)
 //                    emitter.onComplete()
                 }
             }
 
-            val cancelAble = TextUtils.isEmpty(buttonTextPositive) && TextUtils.isEmpty(buttonTextNegative)
+            val cancelAble =
+                TextUtils.isEmpty(buttonTextPositive) && TextUtils.isEmpty(buttonTextNegative)
             builder.setCancelable(cancelAble)//是否可取消
             val alertDialog = builder.create()
             alertDialog.show()
             alertDialog.setOnDismissListener { _ ->
                 if (cancelAble) {
-                    it.resume(true)
+                    it.resume(Res(alertDialog, true))
                 }
             }
         }
