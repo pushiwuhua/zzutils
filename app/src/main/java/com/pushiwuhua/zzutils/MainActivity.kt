@@ -1,27 +1,20 @@
 package com.pushiwuhua.zzutils
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import androidx.annotation.UiThread
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.*
+import androidx.lifecycle.lifecycleScope
 import com.pushiwuhua.zzutilslib.*
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import okhttp3.Call
 import java.io.File
 import java.net.URL
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class MainActivity : AppCompatActivity() {
 
@@ -38,6 +31,22 @@ class MainActivity : AppCompatActivity() {
 //                File(Environment.getExternalStorageDirectory().path + File.separator + "testHaHa")
 //            )
 //        }
+
+        lifecycleScope.launch {
+            delay(5000)
+            var dialog: AlertDialog? = null
+            val res = KDialogQk.newDialog(context = this@MainActivity).withBtnTextPositive("hehe").build {dialogObj,conti->
+                Log.i("wzz", "MainActivity onCreate 建立")
+                dialog = dialogObj
+                lifecycleScope.launch {
+                    delay(5000)
+                    dialog?.dismiss()
+                    Log.i("wzz", "MainActivity onCreate 取消2")
+                    conti.resume(false)
+                }
+            }
+            Log.i("wzz", "MainActivity onCreate 结果 $res")
+        }
 
         var call: Call? = null
         btnDown.singleClick {
