@@ -3,7 +3,6 @@
 package com.pushiwuhua.zzutilslib
 
 import android.content.Context
-import android.content.DialogInterface
 import android.text.TextUtils
 import android.view.View
 import androidx.appcompat.app.AlertDialog
@@ -90,7 +89,7 @@ class KDialogQk private constructor(private val context: Context) {
      *
      * @return
      */
-    suspend fun build(blockDialogFinish: ((dialog: AlertDialog, continuation: Continuation<Boolean>) -> Unit)?): Boolean {
+    suspend fun build(blockDialogFinish: ((dialog: AlertDialog, continuation: Continuation<Boolean>) -> Unit)? = null): Boolean {
         return suspendCoroutine {
             val builder = AlertDialog.Builder(context)
             builder.setTitle(title)
