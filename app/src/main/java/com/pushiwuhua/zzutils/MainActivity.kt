@@ -94,7 +94,6 @@ class MainActivity : AppCompatActivity() {
 
         fab.singleClick {
             Log.i("wzz", "MainActivity onCreate2 ")
-            KWaitingDialog.open(lifecycleScope, supportFragmentManager, "haha")
         }
         val filter: KOneFilter<Boolean> = KOneFilter()
         Log.i("wzz", "MainActivity onCreate ${filter.out(true)}")
